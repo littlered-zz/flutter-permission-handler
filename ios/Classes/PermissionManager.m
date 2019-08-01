@@ -74,8 +74,7 @@
 }
 
 + (id)createPermissionStrategy:(PermissionGroup)permission {
-        return [UnknownPermissionStrategy new];
-    }
+    return [UnknownPermissionStrategy new];
 }
 
 @end
