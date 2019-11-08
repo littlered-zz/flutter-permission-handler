@@ -157,6 +157,8 @@ public class PermissionHandlerPlugin implements MethodCallHandler {
   @PermissionGroup
   private static int parseManifestName(String permission) {
     switch (permission) {
+      case Manifest.permission.CAMERA:
+            return PERMISSION_GROUP_CAMERA;
       case Manifest.permission.READ_EXTERNAL_STORAGE:
       case Manifest.permission.WRITE_EXTERNAL_STORAGE:
         return PERMISSION_GROUP_STORAGE;
@@ -473,6 +475,10 @@ public class PermissionHandlerPlugin implements MethodCallHandler {
     final ArrayList<String> permissionNames = new ArrayList<>();
 
     switch (permission) {
+      case PERMISSION_GROUP_CAMERA:
+        if (hasPermissionInManifest(Manifest.permission.CAMERA))
+          permissionNames.add(Manifest.permission.CAMERA);
+        break;
       case PERMISSION_GROUP_STORAGE:
         if (hasPermissionInManifest(Manifest.permission.READ_EXTERNAL_STORAGE))
           permissionNames.add(Manifest.permission.READ_EXTERNAL_STORAGE);

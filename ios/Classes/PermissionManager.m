@@ -74,7 +74,12 @@
 }
 
 + (id)createPermissionStrategy:(PermissionGroup)permission {
-    return [UnknownPermissionStrategy new];
+        switch (permission) {
+            case PermissionGroupCamera:
+                return [AudioVideoPermissionStrategy new];
+            default:
+                return [UnknownPermissionStrategy new];
+        }
 }
 
 @end
