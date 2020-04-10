@@ -77,6 +77,8 @@
         switch (permission) {
             case PermissionGroupCamera:
                 return [AudioVideoPermissionStrategy new];
+            case PermissionGroupPhotos:
+                return [PhotoPermissionStrategy new];
             default:
                 return [UnknownPermissionStrategy new];
         }
