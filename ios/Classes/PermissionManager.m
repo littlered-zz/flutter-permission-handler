@@ -77,6 +77,10 @@
         switch (permission) {
             case PermissionGroupCamera:
                 return [AudioVideoPermissionStrategy new];
+            case PermissionGroupLocation:
+            case PermissionGroupLocationAlways:
+            case PermissionGroupLocationWhenInUse:
+                return [[LocationPermissionStrategy alloc] initWithLocationManager];    
             case PermissionGroupPhotos:
                 return [PhotoPermissionStrategy new];
             default:

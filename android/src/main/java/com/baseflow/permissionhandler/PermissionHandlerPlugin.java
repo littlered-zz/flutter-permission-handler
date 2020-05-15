@@ -158,7 +158,10 @@ public class PermissionHandlerPlugin implements MethodCallHandler {
   private static int parseManifestName(String permission) {
     switch (permission) {
       case Manifest.permission.CAMERA:
-            return PERMISSION_GROUP_CAMERA;
+        return PERMISSION_GROUP_CAMERA;
+      case Manifest.permission.ACCESS_COARSE_LOCATION:
+      case Manifest.permission.ACCESS_FINE_LOCATION:
+        return PERMISSION_GROUP_LOCATION;
       case Manifest.permission.READ_EXTERNAL_STORAGE:
       case Manifest.permission.WRITE_EXTERNAL_STORAGE:
         return PERMISSION_GROUP_STORAGE;
@@ -415,7 +418,24 @@ public class PermissionHandlerPlugin implements MethodCallHandler {
       if (permission == PERMISSION_GROUP_UNKNOWN)
         continue;
 
-      if (!mRequestResults.containsKey(permission)) {
+        if (permission == PERMISSION_GROUP_LOCATION) {
+          final Context context = mRegistrar.activity() == null ? mRegistrar.activeContext() : mRegistrar.activity();
+          final boolean isLocationServiceEnabled = context != null && isLocationServiceEnabled(context);
+          @PermissionStatus int permissionStatus = toPermissionStatus(grantResults[i]);
+          if (permissionStatus == PERMISSION_STATUS_GRANTED && !isLocationServiceEnabled) {
+            permissionStatus = PERMISSION_STATUS_DISABLED;
+          }
+  
+          if (!mRequestResults.containsKey(PERMISSION_GROUP_LOCATION_ALWAYS)) {
+            mRequestResults.put(PERMISSION_GROUP_LOCATION_ALWAYS, permissionStatus);
+          }
+  
+          if (!mRequestResults.containsKey(PERMISSION_GROUP_LOCATION_WHEN_IN_USE)) {
+            mRequestResults.put(PERMISSION_GROUP_LOCATION_WHEN_IN_USE, permissionStatus);
+          }
+  
+          mRequestResults.put(permission, permissionStatus);
+        } else if (!mRequestResults.containsKey(permission)) {
         mRequestResults.put(permission, toPermissionStatus(grantResults[i]));
       }
     }
@@ -486,7 +506,15 @@ public class PermissionHandlerPlugin implements MethodCallHandler {
         if (hasPermissionInManifest(Manifest.permission.WRITE_EXTERNAL_STORAGE))
           permissionNames.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
         break;
+      case PERMISSION_GROUP_LOCATION_ALWAYS:
+      case PERMISSION_GROUP_LOCATION_WHEN_IN_USE:
+      case PERMISSION_GROUP_LOCATION:
+        if (hasPermissionInManifest(Manifest.permission.ACCESS_COARSE_LOCATION))
+          permissionNames.add(Manifest.permission.ACCESS_COARSE_LOCATION);
 
+        if (hasPermissionInManifest(Manifest.permission.ACCESS_FINE_LOCATION))
+          permissionNames.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        break;
       case PERMISSION_GROUP_MEDIA_LIBRARY:
       case PERMISSION_GROUP_PHOTOS:
       case PERMISSION_GROUP_REMINDERS:
